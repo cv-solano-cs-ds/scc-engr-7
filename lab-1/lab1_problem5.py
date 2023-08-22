@@ -7,4 +7,7 @@ int2: int = int(input("Type another integer: "))
 
 are_inputs_equal: bool = int1 == int2
 
-print(are_inputs_equal)
+print(f"{int1=}")
+print(f"{int2=}")
+
+print(f"{are_inputs_equal=}")
