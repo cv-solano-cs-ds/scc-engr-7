@@ -45,7 +45,7 @@ def deal_cards(d, n=2):
     Returns:
         hand - set of n tuples representing cards
     """
-    hand = set(sample(d, n))
+    hand = set(sample(list(d), n))
 
     for card in hand:
         d.remove(card)
