@@ -146,7 +146,7 @@ def best_score(hand):
     return best_score
 
 
-def strategy_stop_at(hand, n):
+def strategy_stop_at(hand, n, *args, **kwargs):
     """
     Returns True or False depending on whether the customer should
     continue or not. Continue if the customer score <= n (return True)
@@ -163,14 +163,14 @@ def strategy_stop_at(hand, n):
         return False
 
 
-def strategy_dealer_sensitive(hand, card):
+def strategy_dealer_sensitive(hand, card, *args, **kwargs):
     """
     Returns True or False depending on whether the costomer should
     continue or not.
 
     Continue in the case that
         * card is an ace, 7, 8, 9, 10, king, queen, or jack AND
-         the best_score of hand has less than 17 OR
+          the best_score of hand has less than 17 OR
         * card is a 2, 3, 4, 5, or 6 AND the customer has less than 12.
 
     Return False in all other cases
@@ -179,12 +179,24 @@ def strategy_dealer_sensitive(hand, card):
         hand     -  set of tuples representing cards
         card     -  tuple representing the visible card of the dealer
     """
-    # TODO Replace the below two lines with your code
-    print(" ~~~ strategy_dealer_sensitive() not yet implemented ~~~ ")
-    return
+    # # TODO Replace the below two lines with your code
+    # print(" ~~~ strategy_dealer_sensitive() not yet implemented ~~~ ")
+    # return
+    if (
+        card[0] in ["7", "8", "9", "10", "king", "queen", "jack", "ace"]
+        and best_score(hand) < 17
+    ):
+        return True
+    elif card[0] in ["2", "3", "4", "5", "6"] and best_score(hand) < 12:
+        return True
+    return False
+    # return (
+    #     card in ["7", "8", "9", "10", "king", "queen", "jack", "ace"]
+    #     and best_score(hand) > 17
+    # ) or (card in ["2", "3", "4", "5", "6"] and best_score(hand) < 12)
 
 
-def strategy_conservative(hand, card):
+def strategy_conservative(hand, card, *args, **kwargs):
     """
     Returns True or False depending on whether the customer should
     continue or not.
@@ -197,30 +209,47 @@ def strategy_conservative(hand, card):
         hand     -  set of tuples representing cards
         card     -  tuple representing the visible card of the dealer
     """
-    # TODO Replace the below two lines with your code
-    print(" ~~~ strategy_conservative() not yet implemented ~~~ ")
-    return
+    # # TODO Replace the below two lines with your code
+    # print(" ~~~ strategy_conservative() not yet implemented ~~~ ")
+    # return
+
+    return strategy_stop_at(hand, 15) and strategy_dealer_sensitive(hand, card)
 
 
-def play_21():
+def play_21(verbose: bool = True, strategy: str = "default"):
     """
     Play a game of twenty one!
     Return True if customer wins and False otherwise.
 
+    :param verbose: Whether the print statements should be run.
+    :param strategy: The strategy function to be used. Options are:
+        - "default": uses `strategy_stop_at(customer_hand, 17)`
+        - "sensitive": uses `strategy_dealer_sensitive()`
+        - "conservative": uses `strategy_dealer_conservative()`
+
     """
-    print("*********************************")
-    print("~~~~~~~~~~~ Playing 21 ~~~~~~~~~~")
-    print("*********************************\n")
+
+    if strategy.lower() == "sensitive":
+        strategy_function = strategy_dealer_sensitive
+    elif strategy.lower() == "conservative":
+        strategy_function = strategy_conservative
+    else:
+        strategy_function = strategy_stop_at
+
+    if verbose:
+        print("*********************************")
+        print("~~~~~~~~~~~ Playing 21 ~~~~~~~~~~")
+        print("*********************************\n")
 
     # create a deck of cards
     deck = new_deck()
 
-    ##### TODO remove the next three lines after you finish Problem 1 ####
-    if (best_score(deck)) == 0:
-        print(
-            " *~*~*~*~*~*~*~ best_score() not yet implemented *~*~*~*~*~*~*~ "
-        )
-        return False
+    # ##### TODO remove the next three lines after you finish Problem 1 ####
+    # if (best_score(deck)) == 0:
+    #     print(
+    #         " *~*~*~*~*~*~*~ best_score() not yet implemented *~*~*~*~*~*~*~ "
+    #     )
+    #     return False
 
     # deal 2 cards to the customer
     customer_hand = deal_cards(deck, 2)
@@ -228,69 +257,87 @@ def play_21():
     # deal 2 cards to the dealer
     dealer_hand = deal_cards(deck, 2)
 
-    # game continues as long as the customer decided to keep drawing a card
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("~~~~~~~~~~ Initial Hands ~~~~~~~~")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    if verbose:
+        # game continues as long as the customer decided to keep drawing a card
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("~~~~~~~~~~ Initial Hands ~~~~~~~~")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-    print("Customer's hand")
-    display_hand(customer_hand)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("Dealer's hand")
-    display_hand(dealer_hand)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Customer's hand")
+        display_hand(customer_hand)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Dealer's hand")
+        display_hand(dealer_hand)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
     # sets don't have order, so convert to list and pick the first entry as the
     # visible card
     dealer_visible_card = list(dealer_hand)[0]
-    print("Dealer's visible card is", dealer_visible_card)
+    if verbose:
+        print("Dealer's visible card is", dealer_visible_card)
 
-    while strategy_stop_at(customer_hand, 17):
+    # while strategy_stop_at(customer_hand, 17):
+    # while strategy_dealer_sensitive(customer_hand, dealer_visible_card):
+    # while strategy_conservative(customer_hand, dealer_visible_card):
+    while strategy_function(hand=customer_hand, card=dealer_visible_card, n=17):
         # pick a card for customer
         customer_hand.update(deal_cards(deck, 1))
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print("*** Customer has picked a card ***")
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print("Customer's hand")
-        display_hand(customer_hand)
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        if verbose:
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("*** Customer has picked a card ***")
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("Customer's hand")
+            display_hand(customer_hand)
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
         # check if new card sent customer over 21
         if best_score(customer_hand) > 21:
-            print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
+            if verbose:
+                print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
             return False
 
         # now dealer will decide to choose a card
-        if strategy_stop_at(dealer_hand, 17):
+        # if strategy_stop_at(dealer_hand, 17):
+        # if strategy_dealer_sensitive(customer_hand, dealer_visible_card):
+        # if strategy_conservative(customer_hand, dealer_visible_card):
+        if strategy_function(
+            hand=customer_hand, card=dealer_visible_card, n=17
+        ):
             dealer_hand.update(deal_cards(deck, 1))
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            print("*** Dealer has picked a card ***")
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            print("Dealer's hand")
-            display_hand(dealer_hand)
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            if verbose:
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                print("*** Dealer has picked a card ***")
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                print("Dealer's hand")
+                display_hand(dealer_hand)
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
             # check if the new card sent the dealer over 21
             if best_score(dealer_hand) > 21:
-                print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
+                if verbose:
+                    print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
                 return False
 
         # check if customer won (has exactly 21)
         if best_score(customer_hand) == 21:
-            print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
+            if verbose:
+                print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
             return True
 
         # check if dealer has won (has exactly 21)
         elif best_score(dealer_hand) == 21:
-            print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
+            if verbose:
+                print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
             return False
 
         # check if there is a tie
         elif best_score(customer_hand) == 21 and best_score(dealer_hand) == 21:
-            print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
+            if verbose:
+                print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
             return False
 
-    print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
+    if verbose:
+        print("~~~~~~~~~~GAME HAS ENDED~~~~~~~~~~")
     # customer stopped choosing cards so check if they won
     if (best_score(customer_hand) == 21) and (best_score(dealer_hand) == 21):
         return False
@@ -302,7 +349,7 @@ def play_21():
         return False
 
 
-def play_n(n):
+def play_n(n, strategy: str = "default"):
     """
     Play 21 n times! This function will call play_21 a total of
     n times and return the number of times the customer wins.
@@ -311,8 +358,11 @@ def play_n(n):
     """
 
     num_wins = 0
-    # TODO Replace the below two lines with your code
-    print("~~~ play_n() not yet implemented ~~~")
+    # # TODO Replace the below two lines with your code
+    # print("~~~ play_n() not yet implemented ~~~")
+    for _ in range(n):
+        win = play_21(verbose=False, strategy=strategy)
+        num_wins += 1 if win else 0
 
     return num_wins
 
