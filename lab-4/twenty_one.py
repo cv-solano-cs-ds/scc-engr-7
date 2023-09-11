@@ -8,7 +8,8 @@ from random import sample
 def new_deck():
     """
     Return a set of tuples representing a deck of cards.
-    Tuples are (card value, card suit)"""
+    Tuples are (card value, card suit)
+    """
 
     vals = [
         "2",
@@ -92,6 +93,19 @@ def best_score(hand):
 
     ####### Your code for Problem 1 goes here #######
     ### Add code to calculate score_without_aces (currently set to 0)
+    for card in hand:
+        # If we can convert card[0] to an `int`, then it is "2" though "10"
+        try:
+            score_without_aces += int(card[0])
+        # Otherwise, it is "jack", "queen", "king", or "ace".
+        except ValueError:
+            if card[0] in ["jack", "queen", "king"]:
+                score_without_aces += 10
+            elif card[0] == "ace":
+                number_of_aces += 1
+            else:
+                # If we made it here, this is not a valid card value
+                raise ValueError(f"Invalid card value in {card}")
 
     # now deal with the aces (if any) and find the best score
     if number_of_aces == 0:
