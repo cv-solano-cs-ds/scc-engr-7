@@ -155,6 +155,8 @@ def strategy_stop_at(hand, n, *args, **kwargs):
     Inputs
         hand     -  set of tuples representing cards
         n        -  an integer
+
+    Variable arguments are allowed so that we may generalize `play_21`.
     """
 
     if best_score(hand) < n:
@@ -178,6 +180,8 @@ def strategy_dealer_sensitive(hand, card, *args, **kwargs):
     Inputs
         hand     -  set of tuples representing cards
         card     -  tuple representing the visible card of the dealer
+
+    Variable arguments are allowed so that we may generalize `play_21`.
     """
 
     if (
@@ -217,14 +221,19 @@ def play_21(verbose: bool = True, strategy: str = "default"):
         - "default": uses `strategy_stop_at(customer_hand, 17)`
         - "sensitive": uses `strategy_dealer_sensitive()`
         - "conservative": uses `strategy_dealer_conservative()`
-
     """
 
-    if strategy.lower() == "sensitive":
+    if strategy.lower().strip() == "sensitive":
         strategy_function = strategy_dealer_sensitive
-    elif strategy.lower() == "conservative":
+    elif strategy.lower().strip() == "conservative":
         strategy_function = strategy_conservative
+    elif strategy.lower().strip() == "default":
+        strategy_function = strategy_stop_at
     else:
+        print(
+            f"argument {strategy=} in `play_21` unknown."
+            + " Using default strategy."
+        )
         strategy_function = strategy_stop_at
 
     if verbose:
@@ -333,7 +342,7 @@ def play_n(n, strategy: str = "default"):
     Play 21 n times! This function will call play_21 a total of
     n times and return the number of times the customer wins.
 
-        Returns the number of customer wins (out of n)
+    Returns the number of customer wins (out of n)
     """
 
     num_wins = 0
