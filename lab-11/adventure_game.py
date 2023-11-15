@@ -66,7 +66,6 @@ class Room:
     * `get_room(name)`            -   Returns the Room object with name name if the name is part of self.accessible_room
     * `get_item(name)`            -   Returns the Item with name name if name is in self.items
     * `add_accessible_room(room)` -   Add a new room to the self.accessible_rooms set.
-
     """
 
     def __init__(
@@ -101,7 +100,12 @@ class Room:
                 )
 
         # TODO add code here to print description of all items in the Room
-        print("****** Room.describe() is not complete ******")
+        # print("****** Room.describe() is not complete ******")
+        if len(self.items) > 0:
+            print("\nYou notice some items in here")
+            for item in self.items:
+                print(f"\t{item.name}:", end="\t ")
+                item.describe()
 
         if len(self.items) == 0 and len(self.characters) == 0:
             print("\nYou are alone here...")
@@ -130,7 +134,11 @@ class Room:
         :return: If the room is accessible, return the Room object. Else, None.
         """
         # TODO replace print statement with your code
-        print("****** Room.get_room() is not yet implemented ******")
+        # print("****** Room.get_room() is not yet implemented ******")
+        for room in self.accessible_rooms:
+            if room.name == name:
+                return room
+        print(f"It doesn't look like {name} is accessible from here.")
 
     def get_character(self, name: str) -> Character | None:
         """
@@ -341,15 +349,32 @@ class Hero(Character):
         :param name: The name of the Item.
         """
         # TODO replace with your code
-        print("****** Hero.pick_up is not yet implemented ******")
+        # print("****** Hero.pick_up is not yet implemented ******")
+        item = self.location.get_item(name)
+        if item is not None:
+            print(f"You pick up the {name} and put it in your backpack.")
+            self.backpack.add(item)
+            return
+        print(f"It looks like {name} is not in your current room!")
 
-    def rummage(self):
+    def rummage(self) -> list[Item]:
         """
         Print each item in self.backpack with its description and return a list
         of item names.
         """
         # TODO replace with your code
-        print("****** Hero.rummage is not yet implemented ******")
+        # print("****** Hero.rummage is not yet implemented ******")
+        item_names = []
+        print("You rummage through your backpack.", end=" ")
+        if len(self.backpack) > 0:
+            print("You have the following items:")
+            for item in self.backpack:
+                item_names.append(item)
+                print(f"\t{item.name}:", end="\t ")
+                item.describe()
+        else:
+            print("Your inventory is empty!")
+        return item_names
 
     def unlock(self, name: str):
         """
@@ -362,7 +387,35 @@ class Hero(Character):
 
         :param name: The name of the Room object."""
         # TODO replace with your code
-        print("****** Hero.unlock is not implemented ******")
+        # print("****** Hero.unlock is not implemented ******")
+
+        # First, check to see if Hero has *any* key:
+        has_key: bool = False
+        for item in self.backpack:
+            if isinstance(item, Key):
+                has_key = True
+                key_to_unlock = item
+                break
+        if not has_key:
+            print("You do not have a key in your inventory!")
+            return
+
+        # Check for `name` in accessible rooms:
+        has_room: bool = False
+        for room in self.location.accessible_rooms:
+            if room.name == name:
+                has_room = True
+                room_to_open = room
+                break
+        if not has_room:
+            print(
+                "The room you are trying to unlock is not accessible from here!"
+            )
+            return
+
+        # Use the key to unlock the room:
+        key_to_unlock.use(room=room_to_open)
+        print(f"You unlock {room_to_open.name} using {key_to_unlock.name}.")
 
     def describe(self):
         """
