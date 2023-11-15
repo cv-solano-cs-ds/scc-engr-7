@@ -48,7 +48,8 @@ chef = Character(
 tax_expert = Character(
     "tax_expert",
     "An expert on historical taxes.",
-    "I was trying to learn about tax collection in the Ottoman Empire when I came here.",
+    "I was trying to learn about tax collection in the Ottoman Empire when"
+    + " I came here.",
     "I had a book somewhere, I think it is in the reading_room.",
 )
 
