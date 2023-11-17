@@ -382,7 +382,7 @@ class Hero(Character):
         from current location.
 
         Method will check if there is a Room in self.accessible_rooms with the
-        input name AND self.backpack contains at least on Key object before
+        input name AND self.backpack contains at least one Key object before
         using the Key to unlock the Room.
 
         :param name: The name of the Room object."""
@@ -414,7 +414,7 @@ class Hero(Character):
             return
 
         # Use the key to unlock the room:
-        key_to_unlock.use(room=room_to_open)
+        key_to_unlock.use(room_to_open)
         print(f"You unlock {room_to_open.name} using {key_to_unlock.name}.")
 
     def describe(self):
@@ -470,7 +470,7 @@ def print_guide():
 from load_world import *
 
 if __name__ == "__main__":
-    hero_name = input("Before we begin, what is your name?\n>>")
+    hero_name = input("Before we begin, what is your name?\n>> ")
     hero = Hero(
         hero_name,
         "Hero of the game (You!)",

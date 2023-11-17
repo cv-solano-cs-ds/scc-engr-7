@@ -1,10 +1,4 @@
-from adventure_game import (
-    Item,
-    Key,
-    Coin,
-    Room,
-    Character,
-)
+from adventure_game import Item, Key, Coin, Room, Character
 
 # Items in the game
 ottoman_empire_book = Item(
